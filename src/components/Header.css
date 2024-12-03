@@ -1,0 +1,25 @@
+.header {
+    background: #282c34;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+  }
+  
+  .header .logo {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .header .nav {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .header .link {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+  

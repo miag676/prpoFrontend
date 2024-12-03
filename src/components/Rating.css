@@ -1,0 +1,14 @@
+.rating {
+    margin: 20px 0;
+  }
+  
+  .rating span {
+    margin-right: 5px;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  
+  .rating span:hover {
+    color: darkorange;
+  }
+  
