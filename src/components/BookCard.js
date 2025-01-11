@@ -39,9 +39,12 @@ const BookCard = ({ book, onAddToList, onAddRating, averageRating, userRating, l
       >
         <option value="">Select a list</option>
         {lists.map((list) => (
+          <>
+          {console.log(list)}
           <option key={list.id} value={list.id}>
             {list.name}
           </option>
+          </>
         ))}
       </select>
       <button onClick={handleAddToList}>Add to List</button>

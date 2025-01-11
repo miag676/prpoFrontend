@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -8,28 +8,33 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null); // Add userId state
 
   useEffect(() => {
-    // Check if the user is logged in by looking at localStorage (or cookie)
-    const token = localStorage.getItem('authToken');
-    if (token) {
+    // Check if the user is logged in by looking at localStorage
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
       setIsAuthenticated(true);
+      setUserId(storedUserId); // Restore userId from localStorage
     }
   }, []);
 
-  const login = (token) => {
-    localStorage.setItem('authToken', token);
-    setIsAuthenticated(true);
+  const login = (id) => {
+    localStorage.setItem("userId", id);
+      setIsAuthenticated(true);
+      setUserId(id); 
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem("userId"); 
+    console.log("logout");
     setIsAuthenticated(false);
-    window.location.href = "/login"; 
+    setUserId(null); // Clear userId state
+    window.location.href = "/login";
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

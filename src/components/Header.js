@@ -1,14 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId"); 
+    console.log("logout successful");
+    window.location.href = "/login";
+  };
+
   return (
     <header style={styles.header}>
       <h1 style={styles.logo}>LitLink</h1>
       <nav style={styles.nav}>
         <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/profile" style={styles.link}>Profile</Link>
+        <button onClick={handleLogout} style={{ ...styles.link, background: 'none', border: 'none', cursor: 'pointer' }}>
+          Logout
+        </button>
       </nav>
     </header>
   );

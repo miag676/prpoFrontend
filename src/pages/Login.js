@@ -1,29 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api";
-import { useAuth } from "../AuthContext"; 
+import { useAuth } from "../AuthContext";
 
 const Login = () => {
-  const [userName, setUserName] = useState(""); // Change to userName
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-const { login } = useAuth();
+  const { login } = useAuth();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await loginUser(userName, password); // Use userName instead of email
-    alert("Login successful!");
-    console.log(response);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await loginUser(userName, password);
+      alert("Login successful!");
+      console.log(response);
 
-    // Use the token returned by the backend
-    login(response.token); // Save the token and set isAuthenticated
-    navigate("/"); // Redirect to the home page
-  } catch (error) {
-    alert("Login failed. Check console for details.");
-    console.error(error);
-  }
-};
+      login(response.id); // Pass userId to login
+      navigate("/"); // Redirect to the home page
+    } catch (error) {
+      alert("Login failed. Check console for details.");
+      console.error(error);
+    }
+  };
 
   const handleRegisterRedirect = () => {
     navigate("/register");
@@ -32,10 +31,10 @@ const handleSubmit = async (e) => {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        type="text" // Change input type to text
+        type="text"
         placeholder="Username"
-        value={userName} // Use userName state
-        onChange={(e) => setUserName(e.target.value)} // Update userName state
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
       />
       <input
         type="password"

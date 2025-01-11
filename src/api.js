@@ -1,10 +1,11 @@
 import axios from "axios";
 
 const USERS_URL = "http://localhost:8080/v1";
-const BASE_URL = "http://localhost:8080/v1";
 const BOOKS_URL = "http://localhost:9090/v1";
 const RATINGS_URL = "http://localhost:9091/v1/ratings";
-const LISTS_URL = "http://localhost:9092/v1/lists";
+const LISTS_URL = "http://localhost:9092/v1";
+const RECOMMENDATIONS_URL = "http://localhost:9093/v1/recommendations";
+const NOTIFICATIONS_URL = "http://localhost:9095/v1/notifications";
 
 //USERS
 
@@ -54,9 +55,10 @@ export const loginUser = async (userName, password) => {
 export const getAllLists = async () => {
   try {
     const response = await axios.get(`${LISTS_URL}/lists`);
+    console.log("response", response);
     return response.data;
   } catch (error) {
-    console.error("Error fetching lists:", error.response?.data || error);
+    console.error("Error fetching lists:", error.response?.data || error); 
     throw error;
   }
 };
@@ -166,8 +168,54 @@ export const addRating = async (ratingData) => {
   try {
     const response = await axios.post(RATINGS_URL, ratingData);
     return response.data;
-  } catch (error) {
+  } catch (error) { 
     console.error("Error adding rating:", error.response?.data || error);
     throw error;
   }
 };
+
+export const getRecommendations = async (userId) => {
+  console.log("userId", userId)
+  try {
+    const response = await axios.get(`${RECOMMENDATIONS_URL}/${userId}`);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching recommendations:", error.response?.data || error);
+    throw error;
+  }
+};
+
+export const getNotifications = async (userId) => {
+  try {
+    const response = await axios.get(`${NOTIFICATIONS_URL}/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching notifications:", error.response?.data || error);
+    throw error;
+  }
+};
+
+// Clear notifications for a user
+export const clearNotifications = async (userId) => {
+  try {
+    const response = await axios.delete(`${NOTIFICATIONS_URL}/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing notifications:", error.response?.data || error);
+    throw error;
+  }
+};
+
+export const addNotification = async (message) => {
+  try {
+    const response = await axios.post(`${NOTIFICATIONS_URL}/add`, message, {
+      headers: { "Content-Type": "text/plain" }, // Ensure correct content type
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding notification:", error.response?.data || error);
+    throw error;
+  }
+};
+

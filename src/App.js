@@ -19,7 +19,7 @@ const App = () => {
             />
           ))}
         </Routes>
-        <Footer />
+        {/* <Footer /> */}
       </Router>
     </AuthProvider>
   );

@@ -50,18 +50,7 @@ const Profile = () => {
         </div>
       </section>
 
-      {/* Reading Lists Section */}
-      <section>
-        <h2>Your Reading Lists</h2>
-        <div>
-          <h3>To Read</h3>
-          <ReadingList books={toReadList} />
-        </div>
-        <div>
-          <h3>Already Read</h3>
-          <ReadingList books={readList} />
-        </div>
-      </section>
+
     </div>
   );
 };

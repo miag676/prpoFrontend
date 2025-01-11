@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import SearchBar from "../components/SearchBar";
 import BookCard from "../components/BookCard";
 import { getAllBooks, addBook, getAllRatings, addRating,   createList,
   getAllLists,
   addBookToList,
   removeBookFromList,
-  deleteList, } from "../api";
+  deleteList,   getNotifications,
+  clearNotifications, addNotification } from "../api";
+import { useAuth } from "../AuthContext";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
@@ -14,24 +17,33 @@ const Home = () => {
   const [newBook, setNewBook] = useState({ title: "", author: "", releaseDate: "" });
   const [lists, setLists] = useState([]);
   const [newList, setNewList] = useState({ name: "", bookIds: [] });
+  const [notifications, setNotifications] = useState([]);
+  const { userId } = useAuth();
+  const navigate = useNavigate();
 
   // Fetch books and ratings
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => { 
       try {
         const fetchedBooks = await getAllBooks();
         const fetchedRatings = await getAllRatings(); // Fetch all ratings
         const fetchedLists = await getAllLists();
+        const fetchedNotifications = await getNotifications(userId);
         setBooks(fetchedBooks);
         setRatings(fetchedRatings);
-        setLists(fetchedLists);
+        console.log("fetchedLists", fetchedLists);
+        setLists(fetchedLists); 
+        console.log("fetchedNotifications", fetchedNotifications);
+        setNotifications(fetchedNotifications);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
+
+  const userLists = lists.filter((list) => list.userId === userId);
 
   // Add a new book
   const handleAddBook = async (e) => {
@@ -40,11 +52,18 @@ const Home = () => {
       const addedBook = await addBook(newBook);
       setBooks((prevBooks) => [...prevBooks, addedBook]);
       setNewBook({ title: "", author: "", releaseDate: "" });
+  
+      // Send a notification to all users
+      const notificationMessage = `A new book titled "${addedBook.title}" by ${addedBook.author} has been added!`;
+      await addNotification(notificationMessage);
+  
       alert("Book added successfully!");
     } catch (error) {
+      console.error("Failed to add book:", error);
       alert("Failed to add book. Check console for details.");
     }
-  };
+  };  
+  
 
   // Add a rating
   const handleAddRating = async (bookId, ratingValue) => {
@@ -79,7 +98,7 @@ const Home = () => {
     e.preventDefault();
     try {
       const createdList = await createList({
-        userId: 1, // Replace with actual user ID from auth context
+        userId: userId, 
         name: newList.name,
         bookIds: [],
       });
@@ -94,39 +113,87 @@ const Home = () => {
   const handleAddBookToList = async (listId, bookId) => {
     try {
       await addBookToList(listId, bookId);
+  
+      setLists((prevLists) =>
+        prevLists.map((list) =>
+          list.id === listId && !list.bookIds.includes(bookId) // Ensure no duplicates
+            ? { ...list, bookIds: [...list.bookIds, bookId] }
+            : list
+        )
+      );
+  
       alert(`Book added to list successfully!`);
     } catch (error) {
       alert("Failed to add book to list. Check console for details.");
     }
+  };  
+  
+
+  const handleRemoveBookFromList = async (listId, bookId) => {
+    try {
+      await removeBookFromList(listId, bookId);
+      setLists((prevLists) =>
+        prevLists.map((list) =>
+          list.id === listId
+            ? { ...list, bookIds: list.bookIds.filter((id) => id !== bookId) }
+            : list
+        )
+      );
+      alert(`Book removed from list successfully!`);
+    } catch (error) {
+      alert("Failed to remove book from list. Check console for details.");
+    }
+  };
+  
+  const handleDeleteList = async (listId) => {
+    try {
+      await deleteList(listId);
+      setLists((prevLists) => prevLists.filter((list) => list.id !== listId));
+      alert("List deleted successfully!");
+    } catch (error) {
+      alert("Failed to delete list. Check console for details.");
+    }
+  };  
+
+  const handleClearNotifications = async () => {
+    try {
+      await clearNotifications(userId);
+      setNotifications([]);
+      alert("Notifications cleared successfully!");
+    } catch (error) {
+      alert("Failed to clear notifications. Check console for details.");
+    }
   };
 
-    // Remove a book from a list
-    const handleRemoveBookFromList = async (listId, bookId) => {
-      try {
-        await removeBookFromList(listId, bookId);
-        alert(`Book removed from list successfully!`);
-      } catch (error) {
-        alert("Failed to remove book from list. Check console for details.");
-      }
+    const goToRecommendations = () => {
+      navigate("/recommendations");
     };
-  
-    // Delete a list
-    const handleDeleteList = async (listId) => {
-      try {
-        await deleteList(listId);
-        setLists((prevLists) => prevLists.filter((list) => list.id !== listId));
-        alert("List deleted successfully!");
-      } catch (error) {
-        alert("Failed to delete list. Check console for details.");
-      }
-    };
-
     
 
   return (
     <div className="home">
-      <h1>Welcome to the LitLink</h1>
-      <SearchBar onSearch={(query) => setQuery(query)} />
+      <h1>Welcome to LitLink</h1>
+
+      {/* <SearchBar onSearch={(query) => setQuery(query)} /> */}
+      <button onClick={goToRecommendations} style={{ marginBottom: "20px" }}>
+        View Recommendations
+      </button>
+
+      <section>
+        <h2>Notifications</h2>
+        {notifications.length > 0 ? (
+          <>
+            <ul>
+              {notifications.map((notification) => (
+                <li key={notification.id}>{notification.message}</li>
+              ))}
+            </ul>
+            <button onClick={handleClearNotifications}>Mark as Seen</button>
+          </>
+        ) : (
+          <p>No notifications available</p>
+        )}
+      </section>
 
       <section>
         <h2>Add a New Book</h2>
@@ -172,8 +239,8 @@ const Home = () => {
 
       <section>
         <h2>Your Lists</h2>
-        {lists.length > 0 ? (
-          lists.map((list) => (
+        {userLists.length > 0 ? (
+          userLists.map((list) => (
             <div key={list.id} className="list-card">
               <h3>{list.name}</h3>
               <ul>
@@ -213,7 +280,7 @@ const Home = () => {
                   onAddRating={handleAddRating}
                   averageRating={averageRating}
                   userRating={userRating}
-                  lists={lists}
+                  lists={userLists}
                 />
               );
             })
