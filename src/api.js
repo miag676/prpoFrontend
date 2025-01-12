@@ -1,11 +1,18 @@
 import axios from "axios";
 
-const USERS_URL = "http://localhost:8080/v1";
-const BOOKS_URL = "http://localhost:9090/v1";
-const RATINGS_URL = "http://localhost:9091/v1/ratings";
-const LISTS_URL = "http://localhost:9092/v1";
-const RECOMMENDATIONS_URL = "http://localhost:9093/v1/recommendations";
-const NOTIFICATIONS_URL = "http://localhost:9095/v1/notifications";
+// const USERS_URL = "http://localhost:8080/v1";
+// const BOOKS_URL = "http://localhost:9090/v1";
+// const RATINGS_URL = "http://localhost:9091/v1/ratings";
+// const LISTS_URL = "http://localhost:9092/v1";
+// const RECOMMENDATIONS_URL = "http://localhost:9093/v1/recommendations";
+// const NOTIFICATIONS_URL = "http://localhost:9095/v1/notifications";
+
+const USERS_URL = "http://72.146.54.221/v1";
+const BOOKS_URL = "http://72.146.54.221/v1";
+const RATINGS_URL = "http://72.146.54.221/v1/ratings";
+const LISTS_URL = "http://72.146.54.221/v1";
+const RECOMMENDATIONS_URL = "http://72.146.54.221/v1/recommendations";
+const NOTIFICATIONS_URL = "http://72.146.54.221/v1/notifications";
 
 //USERS
 
